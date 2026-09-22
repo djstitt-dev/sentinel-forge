@@ -39,6 +39,7 @@ aide.db*
 # Local outputs, archives, caches, and editor files
 /tmp/
 /artifacts/
+/tests/.k42-test-*/
 *.tar
 *.tar.gz
 *.tgz

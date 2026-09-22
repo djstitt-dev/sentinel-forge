@@ -1,7 +1,10 @@
 # Work packages and approval gates
 
-Only Work Package 2 is currently authorized. This plan is not authorization to
-execute later packages. Operational readiness remains unverified.
+Work Package 2 was committed. The operator authorized Work Package 4A only for
+repository-local closure procedure preparation and offline validation, followed
+by finalization and commit. Host execution remains unauthorized. Work stops after
+commit and verification. This plan does not authorize other packages.
+Operational readiness remains unverified.
 
 | Package | Deliverable and acceptance condition | Approval gate |
 | --- | --- | --- |
@@ -9,6 +12,7 @@ execute later packages. Operational readiness remains unverified.
 | 2. Repository governance | Governance, layout, context inventory, evidence manifest, ignore rules, and repository-local validation. | Operator approved finalization and the initial governance commit; stop after the commit. |
 | 3. Baseline discovery | Context-labeled control inventory and authorized anchor checks; inaccessible state recorded as unknown. | Authorize discovery scope; separately approve privileged inspection or accept operator-provided results. |
 | 4. K42 review | Determine whether a final record exists and review what closure can attest. | Separate approval to write a closure record; no AIDE promotion implied. |
+| 4A. K42 procedure preparation | [Proposed closure specification](f117k42-closure.md), host script, and synthetic offline tests. | Repository-only finalization and commit approved; stop after commit and verification without host execution. |
 | 5. Operational requirements | Define interfaces, trust boundaries, access, monitoring, recovery objectives, and measurable acceptance criteria. | Operator architecture and security approval. |
 | 6. Implementation preparation | Reviewed configuration proposals, offline checks, exact change plans, stop conditions, verification, and rollback. | Approved repository scope; no implicit host application. |
 | 7. Host changes | Bounded approved changes with before/after evidence in the correct context. | Explicit host/security approval; any AIDE trust transition separately approved. |

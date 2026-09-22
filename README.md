@@ -10,8 +10,12 @@ defined with the operator.
 Work Package 2 establishes repository governance only. No host configuration is
 managed or applied by these files, and operational readiness has not been
 verified. No F1.17K42 closure record is created here. The operator approved
-finalization and the initial governance commit. Work stops after that commit;
-later work packages require their own authorization.
+finalization and the initial governance commit, completing Work Package 2.
+Later work packages require their own authorization.
+The operator subsequently authorized Work Package 4A, repository-only preparation
+of the [K42 closure procedure](docs/plans/f117k42-closure.md) and offline tests.
+The operator approved finalization and committing the Work Package 4A preparation.
+Host execution remains unauthorized; work stops after commit and verification.
 
 The operator reports an underlying Ubuntu 24.04.4 Forge host. Earlier Codex
 observations of Ubuntu 26.04.1 belong to the CODEX SANDBOX CONTEXT and do not
