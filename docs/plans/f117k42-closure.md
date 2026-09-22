@@ -1,8 +1,37 @@
 # F1.17K42 closure procedure proposal
 
-Status: Work Package 4A, repository-only preparation for operator review. This is
-a procedure specification, not the closure record. Host execution is NOT
-authorized. No host AIDE paths were accessed while preparing or testing it.
+Status: Work Package 4A preparation committed; WP4B host preflight subsequently
+stopped at the stale OS gate. Current scope is approved repository-only
+reconciliation finalization and commit; stop after commit and verification,
+without host preflight or execution. This is a procedure
+specification, not the closure record. No host AIDE paths were accessed by Codex
+while preparing or testing it.
+
+## WP4B reconciled preflight expectations
+The operator's FORGE PRIVILEGED HOST CONTEXT reconciliation on 2026-09-22
+supersedes the earlier Ubuntu 24.04.4 assertion with Ubuntu 26.04.1 LTS,
+kernel `7.0.0-31-generic`, x86-64. Preserve both observations and their provenance
+in the [context inventory](../inventory/execution-contexts.md). The stopped
+preflight reached no AIDE evidence checks and is not a successful preflight.
+
+The prior preflight command was supplied in conversation, not stored as a
+repository script. Its expected OS gate must be Ubuntu 26.04.1 LTS:
+`ID=ubuntu`, `VERSION_ID=26.04`, `VERSION_CODENAME=resolute`, and
+`PRETTY_NAME="Ubuntu 26.04.1 LTS"`. Do not retain Ubuntu 24.04.4 as a current
+acceptance value or relax the gate to accept any Ubuntu version. Unexpected
+identity still requires a stop and operator review. Matching sandbox OS/kernel
+values do not establish host context.
+
+The approved writer remains unchanged: SHA256
+`23c40f541e9d23c88c29118d16e517af689bcf44bd1f5839b402ac4d0d9356a9`, originally
+approved at commit `b2a7c57777c9eaf6115c77299341006ec46d6af4`. It has no OS
+gate; that gate belongs to operator preflight. The remaining preflight checks
+(exact approved HEAD, clean tree, script hash, Python, target absence, source
+metadata, anchor hashes, database equality, and concurrent AIDE process screen)
+remain required. A future reconciliation commit will change HEAD; obtain the
+operator's explicit approved commit before issuing a revised host preflight,
+rather than silently relaxing the HEAD check. This update authorizes no host
+commands and changes no anchor, database, temporal-boundary, or lifecycle semantics.
 
 ## Purpose and temporal boundary
 Close the previously validated F1.17 evidence chain, using the operator-verified

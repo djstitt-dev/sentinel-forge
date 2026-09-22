@@ -15,11 +15,15 @@ Later work packages require their own authorization.
 The operator subsequently authorized Work Package 4A, repository-only preparation
 of the [K42 closure procedure](docs/plans/f117k42-closure.md) and offline tests.
 The operator approved finalization and committing the Work Package 4A preparation.
-Host execution remains unauthorized; work stops after commit and verification.
+Work Package 4A was committed. The subsequent WP4B host preflight stopped at the
+OS gate. The operator approved repository-only reconciliation finalization and
+commit; stop after commit and verification, without host preflight or execution.
 
-The operator reports an underlying Ubuntu 24.04.4 Forge host. Earlier Codex
-observations of Ubuntu 26.04.1 belong to the CODEX SANDBOX CONTEXT and do not
-describe the underlying host. See the context inventory below for provenance.
+WP4B operator reconciliation in FORGE PRIVILEGED HOST CONTEXT on 2026-09-22
+establishes Ubuntu 26.04.1 LTS, kernel 7.0.0-31-generic, x86-64. It supersedes
+the earlier operator-reported Ubuntu 24.04.4 assertion. Earlier Codex OS/kernel
+observations happened to match; they remain CODEX SANDBOX CONTEXT evidence and
+did not prove host context. See the context inventory below for provenance.
 
 ## Governance and entry points
 The operator alone approves security-sensitive, architecture-changing,
