@@ -1,0 +1,54 @@
+# Local agent/tool state
+/.agents/
+/.codex/
+
+# Secrets and authentication material (content review is still required)
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+.ssh/
+.gnupg/
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+authorized_keys
+known_hosts
+shadow
+gshadow
+*.token
+
+# AIDE databases, raw evidence, sensitive inventories, and captures
+aide.db*
+*.db
+*.db.new
+*.db.gz
+/evidence/raw/
+/evidence/private/
+/evidence/host-inventories/
+*.pcap
+*.pcapng
+*.log
+
+# Local outputs, archives, caches, and editor files
+/tmp/
+/artifacts/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+node_modules/
+*.swp
+*.swo
+*~
+.DS_Store

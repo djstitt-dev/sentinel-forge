@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-22",
+  "recording_context": "CODEX SANDBOX CONTEXT",
+  "purpose": "References to operator-verified host evidence; no independent Codex host verification",
+  "provenance": {
+    "source": "Operator-supplied validated anchors in initial discovery instructions, clarified in Work Package 2 approval",
+    "collector": "operator",
+    "verification_status": "operator-verified host evidence",
+    "execution_context": null,
+    "execution_context_status": "Forge host origin supplied; FORGE USER HOST CONTEXT versus FORGE PRIVILEGED HOST CONTEXT not specified",
+    "collected_at": null,
+    "collection_command": null,
+    "codex_independently_verified": false
+  },
+  "anchors": [
+    {
+      "id": "trusted-aide-database",
+      "path": "/var/lib/aide/aide.db",
+      "sha256": "3c63b0d1bca62c4cc0472239962fbeef84979842207cee5bbd9ebcd22f39b18f",
+      "digest_provenance": "operator-supplied verified host SHA256"
+    },
+    {
+      "id": "candidate-aide-database",
+      "path": "/var/lib/aide/aide.db.new",
+      "sha256": null,
+      "reported_relation": "byte-identical to trusted-aide-database at operator observation",
+      "relation_provenance": "operator-supplied verified host comparison; command and time not supplied"
+    },
+    {
+      "id": "local-aide-policy",
+      "path": "/etc/aide/aide.conf.d/90_sentinel_forge_local",
+      "sha256": "72e121a5151844906acdfb2b12a7201d4a9ec382fc7db39b7317e064f14a4407",
+      "digest_provenance": "operator-supplied verified host SHA256"
+    },
+    {
+      "id": "k41-post-promotion-verification",
+      "path": "/var/lib/aide/trusted-history/f117k41-final-post-promotion-verification.txt",
+      "sha256": "32ba78267a8a980b6c2067ba98038446e807acad1b1d748241ba0ebe3646b05f",
+      "digest_provenance": "operator-supplied verified host SHA256"
+    }
+  ]
+}
