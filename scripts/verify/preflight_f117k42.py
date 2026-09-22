@@ -181,7 +181,8 @@ class Inspection:
         if repository:
             require(s.st_uid in (0, self.operator.pw_uid),
                     "Unexpected repository ancestor owner: " + path)
-            # Operator-group-writable repository directories remain permitted.
+            # Repository group-writable paths are permitted only for root or the
+            # forgeadmin group; world-writable paths remain refused.
             require(not (s.st_mode & 0o002),
                     "World-writable repository ancestor: " + path)
             require(not (s.st_mode & 0o020)
@@ -222,8 +223,15 @@ class Inspection:
         owners = (0, self.operator.pw_uid) if repository else (0,)
         require(before.st_uid in owners,
                 "Unexpected source owner; root required for AIDE evidence: " + path)
-        require(not (before.st_mode & 0o022),
-                "Group/world-writable source refused: " + path)
+        if repository:
+            require(not (before.st_mode & 0o002),
+                    "World-writable repository source refused: " + path)
+            require(not (before.st_mode & 0o020)
+                    or before.st_gid in (0, self.operator.pw_gid),
+                    "Unexpected repository source group: " + path)
+        else:
+            require(not (before.st_mode & 0o022),
+                    "Group/world-writable source refused: " + path)
         fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW |
                      os.O_NONBLOCK | os.O_NOATIME, dir_fd=parent)
         self.stack.callback(os.close, fd)

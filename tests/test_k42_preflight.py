@@ -20,8 +20,8 @@ pf = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pf)  # Inert import; main is guarded.
 
 
-def file_stat(uid=0, mode=stat.S_IFREG | 0o600, links=1):
-    return SimpleNamespace(st_uid=uid, st_gid=0, st_mode=mode, st_nlink=links,
+def file_stat(uid=0, gid=0, mode=stat.S_IFREG | 0o600, links=1):
+    return SimpleNamespace(st_uid=uid, st_gid=gid, st_mode=mode, st_nlink=links,
                            st_dev=42, st_ino=123, st_size=456,
                            st_mtime_ns=100, st_ctime_ns=200)
 
@@ -148,6 +148,60 @@ class PreflightTests(unittest.TestCase):
                     with redirect_stdout(io.StringIO()):
                         with self.assertRaises(RuntimeError):
                             view.open_regular(pf.CANDIDATE)
+
+    def test_repository_file_0664_owned_by_forgeadmin_is_allowed(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.stack = SimpleNamespace(callback=lambda *args: None)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.open_directory = Mock(return_value=99)
+        s = file_stat(uid=1001, gid=1001, mode=stat.S_IFREG | 0o664)
+        with patch.object(pf.os, 'stat', return_value=s):
+            with patch.object(pf.os, 'open', return_value=123):
+                with patch.object(pf.os, 'fstat', return_value=s):
+                    entry = view.open_regular(pf.PREFLIGHT, repository=True)
+        self.assertEqual(entry[0], 123)
+
+    def test_repository_directory_0775_owned_by_forgeadmin_is_allowed(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.directories = {}
+        s = file_stat(uid=1001, mode=stat.S_IFDIR | 0o775)
+        with patch.object(pf.os, 'fstat', return_value=s):
+            view.check_directory('/repository', 2, repository=True)
+
+    def test_repository_world_writable_file_and_directory_refused(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.open_directory = Mock(return_value=99)
+        for mode in (stat.S_IFREG | 0o666, stat.S_IFREG | 0o607):
+            with self.subTest(mode=oct(mode)):
+                with patch.object(pf.os, 'stat', return_value=file_stat(uid=1001, mode=mode)):
+                    with self.assertRaisesRegex(RuntimeError, 'World-writable repository'):
+                        view.open_regular(pf.PREFLIGHT, repository=True)
+        view.directories = {}
+        with patch.object(pf.os, 'fstat', return_value=file_stat(uid=1001, mode=stat.S_IFDIR | 0o777)):
+            with self.assertRaisesRegex(RuntimeError, 'World-writable repository ancestor'):
+                view.check_directory('/repository', 2, repository=True)
+
+    def test_repository_symlink_and_hardlink_refused(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.open_directory = Mock(return_value=99)
+        for mode, links in ((stat.S_IFLNK | 0o777, 1), (stat.S_IFREG | 0o664, 2)):
+            with self.subTest(mode=oct(mode), links=links):
+                with patch.object(pf.os, 'stat', return_value=file_stat(uid=1001, mode=mode, links=links)):
+                    with self.assertRaises(RuntimeError):
+                        view.open_regular(pf.PREFLIGHT, repository=True)
+
+    def test_privileged_evidence_remains_root_only_and_strict(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.open_directory = Mock(return_value=99)
+        for uid, mode in ((1001, stat.S_IFREG | 0o600), (0, stat.S_IFREG | 0o620)):
+            with self.subTest(uid=uid, mode=oct(mode)):
+                with patch.object(pf.os, 'stat', return_value=file_stat(uid=uid, mode=mode)):
+                    with self.assertRaisesRegex(RuntimeError, 'root required|Group/world-writable'):
+                        view.open_regular(pf.CANDIDATE, repository=False)
 
     def test_target_absent_never_creates_and_existing_symlink_stops(self):
         with patch.object(pf.os, 'open', side_effect=AssertionError('target creation')):
