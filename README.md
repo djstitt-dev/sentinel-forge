@@ -3,8 +3,9 @@
 Forge is a hardened Ubuntu Sentinel component. This repository will hold its
 governance, reviewed configuration, verification procedures, and operational
 documentation. Significant host hardening and AIDE baseline work predates it.
-Forge's operational interfaces and acceptance criteria are proposed in the WP5
-draft below and await operator decisions and approval.
+Forge's operational interfaces and acceptance criteria were established in the
+operator-approved WP5 architecture and requirements. Bounded repository-only
+WP6.1 implementation preparation is now authorized and in progress.
 
 ## Current status
 Work Package 2 establishes repository governance only. No host configuration is
@@ -19,9 +20,13 @@ Work Package 4A was committed. The subsequent WP4B host preflight stopped at the
 OS gate. The operator approved repository-only reconciliation finalization and
 commit; that historical authorization does not authorize current work.
 
-Current scope is repository-only WP5 architecture/requirements drafting and
-offline validation. The draft is pending operator review; no commit, WP6 work,
-host discovery, runtime implementation or deployment is authorized.
+WP5 architecture/security review was subsequently approved by the operator and
+committed at revision `0ce6457b31c7d798bf00626aeaeaeb963a103e52`.
+
+Current scope is bounded repository-only WP6.1 Forge/Courier/Scribe
+implementation preparation and offline validation. Runtime implementation, host
+discovery or mutation, network connectivity, credentials, privileged execution,
+deployment, Conduit execution and AIDE actions remain unauthorized.
 
 The operator's 2026-09-25 FORGE PRIVILEGED HOST CONTEXT observation establishes
 existence of the historical K42 record. Preserve it without regeneration or
@@ -43,8 +48,10 @@ destructive, privileged, and trust-boundary actions. Approval of repository work
 does not authorize deployment or AIDE trust changes.
 
 - [Agent rules](AGENTS.md)
-- [Proposed WP5 operational architecture](docs/architecture/forge-operational-architecture.md)
-- [WP5 requirements and pending operator decisions](docs/plans/wp5-operational-requirements.md)
+- [Approved WP5 operational architecture](docs/architecture/forge-operational-architecture.md)
+- [WP5 requirements and decision register](docs/plans/wp5-operational-requirements.md)
+- [WP6.1 preparation plan](docs/plans/wp6-forge-courier-scribe-preparation.md)
+- [WP6.1 Forge/Courier/Scribe logical contract](docs/architecture/forge-courier-scribe-contract.md)
 - [Architecture and governance](docs/architecture/governance.md)
 - [Execution contexts and initial observations](docs/inventory/execution-contexts.md)
 - [Evidence handling and provenance](evidence/README.md)
