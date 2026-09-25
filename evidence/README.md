@@ -40,6 +40,12 @@ context were not supplied. Codex has not independently verified these anchors.
 The candidate's digest is not separately claimed: the supplied assertion is
 byte equality with the trusted database.
 
-F1.17K42 conceptual closure was reported validated by the operator, but existence
-of its final record remains unknown. This documentation is not a closure record.
-Creating that record requires separate operator approval after evidence review.
+At initial WP2 documentation, F1.17K42 conceptual closure was reported validated
+by the operator, but final-record existence remained unknown then. The later
+[2026-09-25 operator reconciliation](../docs/inventory/execution-contexts.md#k42-reconciliation-supplied-2026-09-25)
+establishes observed existence in FORGE PRIVILEGED HOST CONTEXT. Preserve the
+historical record; do not regenerate, replace or overwrite it. Current-writer
+provenance is not established and the supplied format evidence indicates that
+the current writer did not generate its exact format. This documentation is not
+a closure record or a current live AIDE-clean assertion. Candidate lifecycle
+remains deferred. No closure creation or host evidence action is authorized by WP5.

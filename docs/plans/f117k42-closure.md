@@ -1,11 +1,18 @@
 # F1.17K42 closure procedure proposal
 
-Status: Work Package 4A preparation committed; WP4B host preflight subsequently
-stopped at the stale OS gate. Current scope is approved repository-only
-reconciliation finalization and commit; stop after commit and verification,
-without host preflight or execution. This is a procedure
-specification, not the closure record. No host AIDE paths were accessed by Codex
-while preparing or testing it.
+Status: historical Work Package 4A procedure preparation, retained for review.
+WP4B preflight subsequently stopped at the stale OS gate. Its repository-only
+reconciliation/commit authorization was historical and is not current authority.
+
+**2026-09-25 reconciliation:** the operator now reports an existing K42 record in
+FORGE PRIVILEGED HOST CONTEXT. See the [dated provenance note](../inventory/execution-contexts.md#k42-reconciliation-supplied-2026-09-25).
+Preserve that record; do not regenerate, replace or overwrite it. Current-writer
+provenance is not established; supplied format evidence indicates the current
+writer did not generate that exact record. The target-absence precondition of
+this historical creation proposal is no longer supported. The procedure and
+command below are historical specifications, not a current action plan or WP5
+authorization. No new closure or current live AIDE-clean assertion follows.
+Candidate lifecycle remains deferred. No host paths were inspected by Codex in WP5.
 
 ## WP4B reconciled preflight expectations
 The operator's FORGE PRIVILEGED HOST CONTEXT reconciliation on 2026-09-22
