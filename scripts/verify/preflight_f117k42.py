@@ -30,6 +30,10 @@ CANDIDATE = "/var/lib/aide/aide.db.new"
 POLICY = "/etc/aide/aide.conf.d/90_sentinel_forge_local"
 K41 = "/var/lib/aide/trusted-history/f117k41-final-post-promotion-verification.txt"
 TARGET = "/var/lib/aide/trusted-history/f117k42-evidence-closure.txt"
+AIDE_RUNTIME = "/var/lib/aide"
+AIDE_ACCOUNT = "_aide"
+AIDE_UID = 985
+AIDE_GID = 985
 HOSTNAME = "sentinel-forge"
 MACHINE_ID = "c1c620cdbd8b4c4fbdd827ed2d769b4f"
 OS_IDENTITY = {
@@ -174,11 +178,20 @@ class Inspection:
         stack.callback(os.close, self.root)
         self.directories = {}
         self.operator = pwd.getpwnam("forgeadmin")
+        self.aide = pwd.getpwnam(AIDE_ACCOUNT)
+        require(self.aide.pw_uid == AIDE_UID and self.aide.pw_gid == AIDE_GID
+                and self.aide.pw_dir == AIDE_RUNTIME
+                and self.aide.pw_shell == "/usr/sbin/nologin",
+                "Unexpected _aide account mapping")
 
-    def check_directory(self, path, fd, repository=False):
+    def check_directory(self, path, fd, repository=False, runtime=False):
         s = os.fstat(fd)
         require(stat.S_ISDIR(s.st_mode), "Not a directory: " + path)
-        if repository:
+        if runtime:
+            require(path == AIDE_RUNTIME and s.st_uid == self.aide.pw_uid
+                    and s.st_gid == 0 and stat.S_IMODE(s.st_mode) == 0o700,
+                    "Unsafe AIDE runtime directory identity: " + path)
+        elif repository:
             require(s.st_uid in (0, self.operator.pw_uid),
                     "Unexpected repository ancestor owner: " + path)
             # Repository group-writable paths are permitted only for root or the
@@ -199,7 +212,7 @@ class Inspection:
             require(directory_identity(s) == self.directories[key][1],
                     "Directory changed: " + path)
 
-    def open_directory(self, path, repository=False):
+    def open_directory(self, path, repository=False, runtime=False):
         require(path.startswith("/"), "Absolute directory path required")
         self.check_directory("/", self.root, repository)
         fd, current = self.root, ""
@@ -210,20 +223,27 @@ class Inspection:
             current += "/" + part
             fd = os.open(part, self.flags, dir_fd=fd)
             self.stack.callback(os.close, fd)
-            self.check_directory(current, fd, repository)
+            self.check_directory(current, fd, repository,
+                                 runtime=runtime and current == AIDE_RUNTIME)
         return fd
 
-    def open_regular(self, path, repository=False):
-        parent = self.open_directory(os.path.dirname(path), repository)
+    def open_regular(self, path, repository=False, candidate=False):
+        parent = self.open_directory(os.path.dirname(path), repository,
+                                     runtime=candidate)
         name = os.path.basename(path)
         before = os.stat(name, dir_fd=parent, follow_symlinks=False)
         metadata(path, before)
         require(stat.S_ISREG(before.st_mode) and before.st_nlink == 1,
                 "Source must be a singly-linked regular file: " + path)
-        owners = (0, self.operator.pw_uid) if repository else (0,)
+        owners = ((self.aide.pw_uid,) if candidate else
+                  ((0, self.operator.pw_uid) if repository else (0,)))
         require(before.st_uid in owners,
                 "Unexpected source owner; root required for AIDE evidence: " + path)
-        if repository:
+        if candidate:
+            require(before.st_gid == self.aide.pw_gid
+                    and stat.S_IMODE(before.st_mode) == 0o600,
+                    "Unsafe AIDE candidate ownership/mode: " + path)
+        elif repository:
             require(not (before.st_mode & 0o002),
                     "World-writable repository source refused: " + path)
             require(not (before.st_mode & 0o020)
@@ -334,8 +354,12 @@ def preflight():
         target_absent(parent)
         # All metadata is checked before evidence hashing. A non-root candidate
         # stops after its exact numeric metadata is printed, before opening it.
-        sources = {path: view.open_regular(path)
-                   for path in (TRUSTED, CANDIDATE, POLICY, K41)}
+        sources = {
+            TRUSTED: view.open_regular(TRUSTED),
+            CANDIDATE: view.open_regular(CANDIDATE, candidate=True),
+            POLICY: view.open_regular(POLICY),
+            K41: view.open_regular(K41),
+        }
         for path, entry in sources.items():
             value = sha256(entry[0])
             print("SHA256", path, value, flush=True)
