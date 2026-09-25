@@ -149,6 +149,39 @@ class PreflightTests(unittest.TestCase):
                         with self.assertRaises(RuntimeError):
                             view.open_regular(pf.CANDIDATE)
 
+    def test_aide_runtime_directory_accepts_pinned_service_identity(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.aide = SimpleNamespace(pw_uid=pf.AIDE_UID, pw_gid=pf.AIDE_GID)
+        view.directories = {}
+        runtime = file_stat(uid=pf.AIDE_UID, gid=0,
+                            mode=stat.S_IFDIR | 0o700)
+        with patch.object(pf.os, 'fstat', return_value=runtime):
+            with redirect_stdout(io.StringIO()):
+                view.check_directory(pf.AIDE_RUNTIME, 2)
+
+    def test_trusted_history_remains_root_controlled_below_aide_runtime(self):
+        view = pf.Inspection.__new__(pf.Inspection)
+        view.operator = SimpleNamespace(pw_uid=1001, pw_gid=1001)
+        view.aide = SimpleNamespace(pw_uid=pf.AIDE_UID, pw_gid=pf.AIDE_GID)
+        view.directories = {}
+
+        safe = file_stat(uid=0, gid=0, mode=stat.S_IFDIR | 0o700)
+        with patch.object(pf.os, 'fstat', return_value=safe):
+            with redirect_stdout(io.StringIO()):
+                view.check_directory('/var/lib/aide/trusted-history', 2)
+
+        for unsafe in (
+            file_stat(uid=pf.AIDE_UID, gid=0, mode=stat.S_IFDIR | 0o700),
+            file_stat(uid=0, gid=0, mode=stat.S_IFDIR | 0o720),
+            file_stat(uid=0, gid=0, mode=stat.S_IFDIR | 0o702),
+        ):
+            view.directories = {}
+            with patch.object(pf.os, 'fstat', return_value=unsafe):
+                with self.assertRaisesRegex(RuntimeError,
+                                            'Unsafe host ancestor ownership/mode'):
+                    view.check_directory('/var/lib/aide/trusted-history', 2)
+
     def test_repository_file_0664_owned_by_forgeadmin_is_allowed(self):
         view = pf.Inspection.__new__(pf.Inspection)
         view.stack = SimpleNamespace(callback=lambda *args: None)

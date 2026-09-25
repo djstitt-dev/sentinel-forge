@@ -184,11 +184,11 @@ class Inspection:
                 and self.aide.pw_shell == "/usr/sbin/nologin",
                 "Unexpected _aide account mapping")
 
-    def check_directory(self, path, fd, repository=False, runtime=False):
+    def check_directory(self, path, fd, repository=False):
         s = os.fstat(fd)
         require(stat.S_ISDIR(s.st_mode), "Not a directory: " + path)
-        if runtime:
-            require(path == AIDE_RUNTIME and s.st_uid == self.aide.pw_uid
+        if path == AIDE_RUNTIME:
+            require(s.st_uid == self.aide.pw_uid
                     and s.st_gid == 0 and stat.S_IMODE(s.st_mode) == 0o700,
                     "Unsafe AIDE runtime directory identity: " + path)
         elif repository:
@@ -212,7 +212,7 @@ class Inspection:
             require(directory_identity(s) == self.directories[key][1],
                     "Directory changed: " + path)
 
-    def open_directory(self, path, repository=False, runtime=False):
+    def open_directory(self, path, repository=False):
         require(path.startswith("/"), "Absolute directory path required")
         self.check_directory("/", self.root, repository)
         fd, current = self.root, ""
@@ -223,13 +223,11 @@ class Inspection:
             current += "/" + part
             fd = os.open(part, self.flags, dir_fd=fd)
             self.stack.callback(os.close, fd)
-            self.check_directory(current, fd, repository,
-                                 runtime=runtime and current == AIDE_RUNTIME)
+            self.check_directory(current, fd, repository)
         return fd
 
     def open_regular(self, path, repository=False, candidate=False):
-        parent = self.open_directory(os.path.dirname(path), repository,
-                                     runtime=candidate)
+        parent = self.open_directory(os.path.dirname(path), repository)
         name = os.path.basename(path)
         before = os.stat(name, dir_fd=parent, follow_symlinks=False)
         metadata(path, before)
