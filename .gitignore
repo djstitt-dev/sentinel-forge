@@ -53,3 +53,22 @@ node_modules/
 *.swo
 *~
 .DS_Store
+
+# Forge local model/runtime assets
+/models/
+
+# Generated deployment/build material
+/build/
+
+# Local pre-change and session recovery copies
+*.pre-*
+*.bak
+/docs/plans/forge-rag-hardening-*-session/
+
+# Downloaded vulnerability feed payloads
+/evidence/vulnerability-intelligence/feeds/*.json
+/evidence/vulnerability-intelligence/feeds/*.xml
+/evidence/vulnerability-intelligence/feeds/*.xml.bz2
+
+# Python-generated caches anywhere in tree
+**/__pycache__/

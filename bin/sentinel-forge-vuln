@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+import argparse,json,sys
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from sentinel_forge.vulnerability_intelligence import package_inventory,assess_snapshot
+from sentinel_forge.vulnerability_feed import FeedMetadata,load_normalized_feed
+p=argparse.ArgumentParser()
+p.add_argument("feed")
+p.add_argument("--source",required=True)
+p.add_argument("--url",required=True)
+p.add_argument("--digest",required=True)
+p.add_argument("--retrieved",required=True)
+p.add_argument("--release",default="resolute")
+a=p.parse_args()
+m=FeedMetadata(a.source,a.url,a.retrieved,a.digest,"normalized-v1",a.release)
+advisories=load_normalized_feed(a.feed,m)
+print(json.dumps(assess_snapshot(advisories),indent=2,sort_keys=True))

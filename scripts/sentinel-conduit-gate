@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Sentinel Conduit forced-command gate for sentinel-reaper."""
+
+from __future__ import annotations
+
+import json
+import os
+import socket
+import sys
+
+from sentinel_forge.conduit_runtime import (
+    ConduitError,
+    authorize_request,
+    parse_forced_command,
+)
+
+
+EXPECTED_PEER_IDENTITY = "sentinel-reaper"
+
+CAPABILITIES = (
+    "status",
+    "capabilities",
+)
+
+
+def emit(payload: dict, *, rc: int = 0) -> int:
+    sys.stdout.write(
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    )
+    sys.stdout.flush()
+    return rc
+
+
+def main() -> int:
+    original_command = os.environ.get("SSH_ORIGINAL_COMMAND", "")
+
+    try:
+        request = parse_forced_command(original_command)
+
+        approved = authorize_request(
+            request,
+            expected_peer_identity=EXPECTED_PEER_IDENTITY,
+        )
+
+    except ConduitError:
+        return emit(
+            {
+                "format": "sentinel-conduit-response-v1",
+                "peer_identity": EXPECTED_PEER_IDENTITY,
+                "result": "DENIED",
+            },
+            rc=77,
+        )
+
+    if approved.operation == "status":
+        return emit(
+            {
+                "format": "sentinel-conduit-response-v1",
+                "hostname": socket.gethostname(),
+                "operation": "status",
+                "peer_identity": EXPECTED_PEER_IDENTITY,
+                "result": "OK",
+            }
+        )
+
+    if approved.operation == "capabilities":
+        return emit(
+            {
+                "capabilities": list(CAPABILITIES),
+                "format": "sentinel-conduit-response-v1",
+                "operation": "capabilities",
+                "peer_identity": EXPECTED_PEER_IDENTITY,
+                "result": "OK",
+            }
+        )
+
+    return emit(
+        {
+            "format": "sentinel-conduit-response-v1",
+            "peer_identity": EXPECTED_PEER_IDENTITY,
+            "result": "DENIED",
+        },
+        rc=77,
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
