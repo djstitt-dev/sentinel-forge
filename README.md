@@ -62,3 +62,4 @@ does not authorize deployment or AIDE trust changes.
 verification, and changes; `tests/` holds future offline checks. `docs/runbooks/`
 will hold approved operating and recovery procedures. These directories do not
 yet contain an implementation.
+# sentinel-forge
